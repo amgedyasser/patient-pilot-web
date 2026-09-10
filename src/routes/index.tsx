@@ -402,16 +402,18 @@ function PatientForm({ onDone }: { onDone: () => void }) {
       return;
     }
     setSaving(true);
-    const { data: existing, error } = await supabase
+    const { data: matches, error } = await supabase
       .from("patients")
       .select("*")
       .eq("phone", digits)
-      .maybeSingle();
+      .order("created_at", { ascending: false })
+      .limit(1);
     setSaving(false);
     if (error) {
       toast.error("تعذر التحقق من رقم الهاتف");
       return;
     }
+    const existing = matches?.[0];
     if (existing) {
       setDuplicate(existing as unknown as Patient);
       return;
