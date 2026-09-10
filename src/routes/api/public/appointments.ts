@@ -58,7 +58,7 @@ export const Route = createFileRoute('/api/public/appointments')({
         }
 
         const rows = (data ?? []) as unknown as Row[]
-        const format = (url.searchParams.get('format') ?? 'csv').toLowerCase()
+        const format = (url.searchParams.get('format') ?? 'json').toLowerCase()
 
         const records = rows.map((r) => ({
           التاريخ: r.appointment_date,
@@ -71,26 +71,27 @@ export const Route = createFileRoute('/api/public/appointments')({
           'تاريخ التسجيل': r.created_at,
         }))
 
-        if (format === 'json') {
-          return Response.json(records, { headers: CORS })
+        if (format === 'csv') {
+          const headers = ['التاريخ', 'الوقت', 'المريض', 'الهاتف', 'الخدمة', 'الحالة', 'ملاحظات', 'تاريخ التسجيل']
+          const lines = [
+            headers.map(csvCell).join(','),
+            ...records.map((rec) => headers.map((h) => csvCell((rec as Record<string, unknown>)[h])).join(',')),
+          ]
+          const csv = '\uFEFF' + lines.join('\r\n')
+          return new Response(csv, {
+            status: 200,
+            headers: {
+              ...CORS,
+              'Content-Type': 'text/csv; charset=utf-8',
+              'Content-Disposition': 'attachment; filename="appointments.csv"',
+              'Cache-Control': 'no-store',
+            },
+          })
         }
 
-        const headers = ['التاريخ', 'الوقت', 'المريض', 'الهاتف', 'الخدمة', 'الحالة', 'ملاحظات', 'تاريخ التسجيل']
-        const lines = [
-          headers.map(csvCell).join(','),
-          ...records.map((rec) => headers.map((h) => csvCell((rec as Record<string, unknown>)[h])).join(',')),
-        ]
-        // BOM so Excel/Sheets read Arabic correctly
-        const csv = '\uFEFF' + lines.join('\r\n')
-
-        return new Response(csv, {
+        return Response.json(records, {
           status: 200,
-          headers: {
-            ...CORS,
-            'Content-Type': 'text/csv; charset=utf-8',
-            'Content-Disposition': 'attachment; filename="appointments.csv"',
-            'Cache-Control': 'no-store',
-          },
+          headers: { ...CORS, 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
         })
       },
     },
