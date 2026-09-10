@@ -186,16 +186,7 @@ function AppSidebar() {
       </nav>
 
       <div className="mt-auto p-3">
-        <div className="relative overflow-hidden rounded-2xl p-4 bg-gradient-to-br from-ink via-[#1B3357] to-brand text-primary-foreground">
-          <div className="absolute -top-6 -left-6 size-20 rounded-full bg-white/10 blur-xl" />
-          <div className="relative">
-            <div className="text-[11px] text-white/70">حالة العيادة</div>
-            <div className="font-cairo font-bold text-base mt-1 flex items-center gap-2">
-              <span className="size-2 rounded-full bg-mint" /> مفتوحة اليوم
-            </div>
-          </div>
-        </div>
-        <div className="mt-3 flex items-center gap-3 px-2 py-2">
+        <div className="flex items-center gap-3 px-2 py-2">
           <img
             src={doctorImg}
             alt="صورة الطبيب"
