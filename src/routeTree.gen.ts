@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PatientsRouteImport } from './routes/patients'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as ApiPublicAppointmentsRouteImport } from './routes/api/public/appointments'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const ServicesRoute = ServicesRouteImport.update({
   path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAppointmentsRoute = ApiPublicAppointmentsRouteImport.update({
+  id: '/api/public/appointments',
+  path: '/api/public/appointments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/patients': typeof PatientsRoute
   '/services': typeof ServicesRoute
+  '/api/public/appointments': typeof ApiPublicAppointmentsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/patients': typeof PatientsRoute
   '/services': typeof ServicesRoute
+  '/api/public/appointments': typeof ApiPublicAppointmentsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/patients': typeof PatientsRoute
   '/services': typeof ServicesRoute
+  '/api/public/appointments': typeof ApiPublicAppointmentsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/patients' | '/services'
+  fullPaths: '/' | '/patients' | '/services' | '/api/public/appointments'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/patients' | '/services'
-  id: '__root__' | '/' | '/patients' | '/services'
+  to: '/' | '/patients' | '/services' | '/api/public/appointments'
+  id: '__root__' | '/' | '/patients' | '/services' | '/api/public/appointments'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   PatientsRoute: typeof PatientsRoute
   ServicesRoute: typeof ServicesRoute
+  ApiPublicAppointmentsRoute: typeof ApiPublicAppointmentsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/appointments': {
+      id: '/api/public/appointments'
+      path: '/api/public/appointments'
+      fullPath: '/api/public/appointments'
+      preLoaderRoute: typeof ApiPublicAppointmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   PatientsRoute: PatientsRoute,
   ServicesRoute: ServicesRoute,
+  ApiPublicAppointmentsRoute: ApiPublicAppointmentsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
