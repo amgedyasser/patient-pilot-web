@@ -18,7 +18,8 @@ export const notifyPatientCreated = createServerFn({ method: "POST" })
   .inputValidator((data) => patientWebhookSchema.parse(data))
   .handler(async ({ data }) => {
     const url = process.env["N8N_WEBHOOK_URL"];
-    const secret = process.env["N8N_WEBHOOK_SECRET"];
+    // Same key as the appointments export endpoint — one key for everything n8n.
+    const secret = process.env["N8N_EXPORT_TOKEN"];
 
     // No webhook configured — fail silently so patient creation still succeeds.
     if (!url) {

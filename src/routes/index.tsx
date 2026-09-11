@@ -372,6 +372,17 @@ function PatientForm({ onDone }: { onDone: () => void }) {
       onDone();
       return;
     }
+    // Notify n8n webhook (fire and forget — never blocks saving)
+    void notifyPatientCreated({
+      data: {
+        name: name.trim(),
+        phone: phone.trim(),
+        notes: notes.trim() || null,
+        service,
+        appointmentDate: date,
+        appointmentTime: time,
+      },
+    }).catch(() => {});
     toast.success("تم فتح ملف للمريض وحجز الموعد");
     reset();
     onDone();
