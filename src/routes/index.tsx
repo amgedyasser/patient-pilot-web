@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Stethoscope, Search } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyPatientCreated } from "@/lib/n8n.functions";
@@ -331,6 +332,7 @@ function PatientForm({ onDone }: { onDone: () => void }) {
   const [time, setTime] = useState(TIME_SLOTS[0] ?? "09:00");
   const [saving, setSaving] = useState(false);
   const [duplicate, setDuplicate] = useState<Patient | null>(null);
+  const notifyN8n = useServerFn(notifyPatientCreated);
 
   const reset = () => {
     setName("");
@@ -373,7 +375,7 @@ function PatientForm({ onDone }: { onDone: () => void }) {
       return;
     }
     // Notify n8n webhook (fire and forget — never blocks saving)
-    void notifyPatientCreated({
+    void notifyN8n({
       data: {
         name: name.trim(),
         phone: phone.trim(),
