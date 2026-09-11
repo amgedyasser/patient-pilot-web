@@ -331,6 +331,7 @@ function PatientForm({ onDone }: { onDone: () => void }) {
   const [time, setTime] = useState(TIME_SLOTS[0] ?? "09:00");
   const [saving, setSaving] = useState(false);
   const [duplicate, setDuplicate] = useState<Patient | null>(null);
+  const notifyN8n = useServerFn(notifyPatientCreated);
 
   const reset = () => {
     setName("");
@@ -373,7 +374,7 @@ function PatientForm({ onDone }: { onDone: () => void }) {
       return;
     }
     // Notify n8n webhook (fire and forget — never blocks saving)
-    void notifyPatientCreated({
+    void notifyN8n({
       data: {
         name: name.trim(),
         phone: phone.trim(),
