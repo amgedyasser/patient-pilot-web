@@ -15,7 +15,7 @@ const patientWebhookSchema = z.object({
  * Reads N8N_WEBHOOK_URL and N8N_WEBHOOK_SECRET from env at call time.
  */
 export const notifyPatientCreated = createServerFn({ method: "POST" })
-  .inputValidator((data) => patientWebhookSchema.parse(data))
+  .validator((data) => patientWebhookSchema.parse(data))
   .handler(async ({ data }) => {
     const url = process.env["N8N_WEBHOOK_URL"];
     // Same key as the appointments export endpoint — one key for everything n8n.
