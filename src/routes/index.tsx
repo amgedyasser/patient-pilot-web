@@ -368,24 +368,34 @@ function PatientForm({ onDone }: { onDone: () => void }) {
       return;
     }
     const apptError = await addAppointment(data.id);
-    setSaving(false);
     if (apptError) {
+      setSaving(false);
       toast.error("تم فتح الملف لكن تعذر حجز الموعد");
       onDone();
       return;
     }
-    // Notify n8n webhook (fire and forget — never blocks saving)
-    void notifyN8n({
-      data: {
-        name: name.trim(),
-        phone: phone.trim(),
-        notes: notes.trim() || null,
-        service,
-        appointmentDate: date,
-        appointmentTime: time,
-      },
-    }).catch(() => {});
-    toast.success("تم فتح ملف للمريض وحجز الموعد");
+    let webhookDelivered = false;
+    try {
+      const result = await notifyN8n({
+        data: {
+          name: name.trim(),
+          phone: phone.trim(),
+          notes: notes.trim() || null,
+          service,
+          appointmentDate: date,
+          appointmentTime: time,
+        },
+      });
+      webhookDelivered = result.ok;
+    } catch {
+      webhookDelivered = false;
+    }
+    setSaving(false);
+    if (webhookDelivered) {
+      toast.success("تم حفظ المريض وإرسال بياناته إلى n8n");
+    } else {
+      toast.warning("تم حفظ المريض، لكن تعذر إرسال بياناته إلى n8n");
+    }
     reset();
     onDone();
   };
