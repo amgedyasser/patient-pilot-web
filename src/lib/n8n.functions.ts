@@ -27,23 +27,35 @@ export const notifyPatientCreated = createServerFn({ method: "POST" })
       return { ok: false, reason: "no_url" };
     }
 
+    const payload: Record<string, string> = {
+      الاسم: data.name,
+      الهاتف: data.phone,
+      ملاحظات: data.notes ?? "",
+      الخدمة: data.service,
+      "تاريخ_الكشف": data.appointmentDate,
+      "وقت_الكشف": data.appointmentTime,
+      "وقت_الإنشاء": new Date().toISOString(),
+    };
+
     try {
-      const res = await fetch(url, {
+      let res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           ...(secret ? { "x-api-key": secret } : {}),
         },
-        body: JSON.stringify({
-          الاسم: data.name,
-          الهاتف: data.phone,
-          ملاحظات: data.notes ?? "",
-          الخدمة: data.service,
-          "تاريخ_الكشف": data.appointmentDate,
-          "وقت_الكشف": data.appointmentTime,
-          "وقت_الإنشاء": new Date().toISOString(),
-        }),
+        body: JSON.stringify(payload),
       });
+
+      // Some n8n webhooks accept GET only — resend the same fields as query params.
+      if (res.status === 404 || res.status === 405) {
+        const qs = new URLSearchParams(payload).toString();
+        const joiner = url.includes("?") ? "&" : "?";
+        res = await fetch(`${url}${joiner}${qs}`, {
+          method: "GET",
+          headers: secret ? { "x-api-key": secret } : {},
+        });
+      }
 
       if (!res.ok) {
         console.error(`n8n webhook responded with ${res.status}`);
